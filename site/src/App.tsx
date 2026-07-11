@@ -106,9 +106,6 @@ function Hero() {
             width="880"
             height="1120"
           />
-          <figcaption className="hero-shot-caption">
-            The actual app. <span aria-hidden="true">↑</span>
-          </figcaption>
         </motion.figure>
       </div>
     </header>
@@ -127,59 +124,6 @@ function Ticker() {
   );
 }
 
-const BOARD = [
-  {
-    title: "18 languages",
-    desc: "Pick any pair from two flag dropdowns, hit ⇄ to swap. Your last pair is remembered.",
-    tag: "flags",
-  },
-  {
-    title: "Summoned anywhere",
-    desc: "A global hotkey toggles the popover over any app. No Dock icon, no window clutter - esc and it's gone.",
-    tag: "keys",
-  },
-  {
-    title: "Fast, then instant",
-    desc: "Live results as you type, stale requests cancelled mid-flight. Repeat lookups come from cache and skip the network entirely.",
-    tag: "cache",
-  },
-  {
-    title: "Copy · hear · save",
-    desc: "Click any result to copy it, play it aloud with native pronunciation, or star it into a phrasebook that persists across restarts.",
-    tag: "star",
-  },
-  {
-    title: "Context, not just words",
-    desc: "Part of speech, usage frequency, transliteration, and expandable real-world example sentences with every translation.",
-    tag: "pos",
-  },
-] as const;
-
-function BoardTag({ tag }: { tag: (typeof BOARD)[number]["tag"] }) {
-  switch (tag) {
-    case "flags":
-      return (
-        <span className="board-flags">
-          {FLAGS.map(([code, name]) => (
-            <img key={code} src={`/flags/${code}.png`} alt={name} title={name} loading="lazy" />
-          ))}
-        </span>
-      );
-    case "keys":
-      return (
-        <span className="board-keys">
-          <kbd>⌥</kbd> <kbd>space</kbd>
-        </span>
-      );
-    case "cache":
-      return <span className="board-pill">0 ms on repeat</span>;
-    case "star":
-      return <span className="board-glyph" aria-hidden="true">★</span>;
-    case "pos":
-      return <span className="board-pill">adv. · freq ▮▮▮</span>;
-  }
-}
-
 function Board() {
   return (
     <section className="board">
@@ -189,16 +133,67 @@ function Board() {
           <br />
           should be. Nothing more.
         </motion.h2>
-        <div className="board-rows">
-          {BOARD.map((row) => (
-            <motion.div {...reveal} className="board-row" key={row.title}>
-              <h3>{row.title}</h3>
-              <p>{row.desc}</p>
-              <div className="board-tag">
-                <BoardTag tag={row.tag} />
+        <div className="bento">
+          <motion.div {...reveal} className="tile tile-languages">
+            <div className="tile-languages-head">
+              <span className="tile-big">18</span>
+              <div>
+                <h3>languages, two clicks</h3>
+                <p>
+                  Pick any pair from two flag dropdowns, hit ⇄ to swap. Your
+                  last pair is remembered.
+                </p>
               </div>
-            </motion.div>
-          ))}
+            </div>
+            <div className="tile-flags" aria-hidden="true">
+              {FLAGS.map(([code, name]) => (
+                <img key={code} src={`/flags/${code}.png`} alt={name} title={name} loading="lazy" />
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div {...reveal} className="tile tile-hotkey">
+            <div className="tile-keys" aria-hidden="true">
+              <kbd>⌥</kbd>
+              <kbd>space</kbd>
+            </div>
+            <h3>Summoned from anywhere</h3>
+            <p>
+              A global hotkey toggles the popover over any app. No Dock icon,
+              no clutter - esc and it&apos;s gone.
+            </p>
+          </motion.div>
+
+          <motion.div {...reveal} className="tile tile-fast">
+            <span className="tile-big">0<small>ms</small></span>
+            <h3>Fast, then instant</h3>
+            <p>
+              Live results as you type, stale requests cancelled mid-flight.
+              Repeat lookups come from cache and skip the network entirely.
+            </p>
+          </motion.div>
+
+          <motion.div {...reveal} className="tile">
+            <span className="tile-glyphs" aria-hidden="true">⧉ ▶ ★</span>
+            <h3>Copy · hear · save</h3>
+            <p>
+              Click any result to copy it, play native pronunciation, or star
+              it into a phrasebook that persists across restarts.
+            </p>
+          </motion.div>
+
+          <motion.div {...reveal} className="tile">
+            <span className="tile-context" aria-hidden="true">
+              <span className="ctx-pill">adv.</span>
+              <span className="ctx-freq"><i /><i /><i /></span>
+              <span className="ctx-translit">privet</span>
+            </span>
+            <h3>Context, not just words</h3>
+            <p>
+              Part of speech, usage frequency, transliteration, and real-world
+              example sentences with every translation.
+            </p>
+          </motion.div>
         </div>
       </div>
     </section>
