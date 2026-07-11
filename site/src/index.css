@@ -1,0 +1,80 @@
+:root {
+  /* Transit-signage palette: drenched signal blue, white sign panels,
+     safety-yellow action, ink for the night sections. */
+  --field: oklch(0.46 0.2 264);
+  --field-deep: oklch(0.38 0.17 264);
+  --field-line: oklch(0.56 0.19 264);
+  --ink: oklch(0.2 0.04 264);
+  --panel: #ffffff;
+  --panel-dim: oklch(0.94 0.01 264);
+  --signal: oklch(0.84 0.16 88);
+  --signal-hover: oklch(0.88 0.16 88);
+  --on-field: #ffffff;
+  --on-field-soft: oklch(0.93 0.03 264);
+  --on-panel: var(--ink);
+  --on-panel-soft: oklch(0.42 0.04 264);
+
+  font-family: "Golos Text Variable", -apple-system, BlinkMacSystemFont, sans-serif;
+  color-scheme: light;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--field);
+  color: var(--on-field);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--signal);
+  color: var(--ink);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.container {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  padding: 4px 9px;
+  font-family: inherit;
+  font-size: 0.82em;
+  font-weight: 700;
+  border: 2px solid currentColor;
+  border-radius: 7px;
+}

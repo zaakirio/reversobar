@@ -1,0 +1,35 @@
+name: site
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "site/**"
+      - "Dockerfile"
+      - ".github/workflows/site.yml"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          # the cluster node is aarch64 (Hetzner ARM)
+          platforms: linux/arm64
+          push: true
+          tags: |
+            ghcr.io/zaakirio/reversobar-site:latest
+            ghcr.io/zaakirio/reversobar-site:${{ github.sha }}

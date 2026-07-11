@@ -1,0 +1,8 @@
+{
+  "framework": "vite",
+  "files": ["site/index.html"],
+  "insertBefore": "</head>",
+  "commentSyntax": "html",
+  "devCommand": "npm run dev --prefix site",
+  "cspChecked": true
+}
