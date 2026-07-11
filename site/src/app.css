@@ -494,8 +494,9 @@
 
 .phonetic-line {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 18px;
+  gap: 10px 18px;
   font-size: clamp(28px, 3.4vw, 44px);
   font-weight: 800;
   min-height: 1.3em;
@@ -654,6 +655,14 @@
 
   .tile-flags {
     grid-template-columns: repeat(6, 1fr);
+  }
+
+  .phonetic-line {
+    font-size: 22px;
+  }
+
+  .phonetic-demo {
+    padding: 22px 20px;
   }
 
   .tile-languages-head {

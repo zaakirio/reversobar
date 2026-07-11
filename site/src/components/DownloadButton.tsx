@@ -37,7 +37,7 @@ export function DownloadButton({ align = "start" }: { align?: "start" | "center"
         </svg>
         Download for macOS
       </motion.a>
-      <p className="download-meta">v{VERSION} · macOS 14+ · Universal · free, notarized</p>
+      <p className="download-meta">v{VERSION} · macOS 14+ · Universal · free &amp; open source</p>
     </div>
   );
 }
