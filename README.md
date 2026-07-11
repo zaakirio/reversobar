@@ -17,9 +17,9 @@ become Cyrillic in real time, with a per-phoneme breakdown.
   skip the network entirely; pronunciations are cached in-memory per session.
 - **18 languages** with rounded-rectangle country flags ([flag-icons](https://github.com/lipis/flag-icons), MIT).
   Pick source/target from two flag dropdowns, ⇄ to swap; your last pair is remembered.
-- **Phonetic typing (Latin → Cyrillic)** — for Cyrillic source languages (Russian, Ukrainian) a
-  **Phonetic** toggle appears: type `privet mir` → **привет мир**, with chips showing each phoneme
-  (`sh → ш`, `zh → ж`, `shch → щ`…).
+- **Phonetic typing (Latin → native script)** — for Russian, Ukrainian, Japanese and Korean a
+  **Phonetic** toggle appears: type `privet mir` → **привет мир**, `konnichiwa` → **こんにちわ**,
+  `annyeong` → **안녕**, with chips showing each phoneme (`sh → ш`, `chi → ち`, `nyeo → 녀`…).
 - **Click to copy · ▶ to hear · ☆ to bookmark** — context translations include part of speech,
   a frequency badge, transliteration, and expandable real-world examples.
 - **Bookmarks** — a personal phrasebook persisted to disk, with a live filter.

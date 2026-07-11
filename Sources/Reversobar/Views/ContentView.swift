@@ -21,10 +21,11 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 header
                 searchField
-                if vm.phonetic && vm.canPhonetic {
-                    PhoneticPreview(cyrillic: vm.cyrillicPreview,
+                if vm.phonetic, let scheme = vm.sourceLang.phoneticScheme {
+                    PhoneticPreview(text: vm.phoneticPreview,
                                     phonemes: vm.phonemes,
                                     language: vm.sourceLang,
+                                    scheme: scheme,
                                     onCopy: { copy($0, label: "\(vm.sourceLang.name) copied") })
                 }
                 Divider().opacity(0.5)
@@ -82,18 +83,8 @@ struct ContentView: View {
 
             Spacer(minLength: 6)
 
-            if vm.canPhonetic {
-                Toggle(isOn: $vm.phonetic.animation(.snappy)) {
-                    HStack(spacing: 5) {
-                        Image(systemName: "keyboard")
-                        Text("Phonetic")
-                    }
-                    .font(.system(size: 12, weight: .medium))
-                }
-                .toggleStyle(.button)
-                .pointingHand()
-                .help("Type Latin letters to build \(vm.sourceLang.name) (Cyrillic) words")
-                .transition(.scale.combined(with: .opacity))
+            if let scheme = vm.sourceLang.phoneticScheme {
+                phoneticToggle(scheme)
             }
 
             bookmarksToggle
@@ -103,19 +94,40 @@ struct ContentView: View {
         .padding(.bottom, 10)
     }
 
+    /// Pure-SwiftUI toggle: the AppKit `.toggleStyle(.button)` bezel used to render detached
+    /// from its label while animating in with the header, leaving a stray square.
+    private func phoneticToggle(_ scheme: PhoneticScheme) -> some View {
+        Button(action: { withAnimation(Theme.Anim.snappy) { vm.phonetic.toggle() } }) {
+            HStack(spacing: 5) {
+                Image(systemName: "keyboard")
+                Text("Phonetic")
+            }
+            .font(.system(size: 12.5, weight: .semibold))
+            .foregroundStyle(vm.phonetic ? Color.accentColor : .secondary)
+            .padding(.horizontal, 11)
+            .padding(.vertical, 6.5)
+            .pillBackground(active: vm.phonetic)
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .pointingHand()
+        .help("Type Latin letters to build \(vm.sourceLang.name) (\(scheme.scriptName)) words")
+    }
+
     private var bookmarksToggle: some View {
         Button(action: toggleBookmarksMode) {
             HStack(spacing: 4) {
                 Image(systemName: mode == .bookmarks ? "bookmark.fill" : "bookmark")
                 if !bookmarks.items.isEmpty {
-                    Text("\(bookmarks.items.count)").font(.system(size: 11, weight: .semibold))
+                    Text("\(bookmarks.items.count)").font(.system(size: 12, weight: .semibold))
                 }
             }
-            .font(.system(size: 12, weight: .medium))
+            .font(.system(size: 12.5, weight: .semibold))
             .foregroundStyle(mode == .bookmarks ? Color.accentColor : .secondary)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
-            .background(.tint.opacity(mode == .bookmarks ? 0.18 : 0), in: Capsule())
+            .padding(.horizontal, 11)
+            .padding(.vertical, 6.5)
+            .pillBackground(active: mode == .bookmarks)
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .pointingHand()
@@ -158,7 +170,8 @@ struct ContentView: View {
 
     private var searchPrompt: String {
         if mode == .bookmarks { return "Filter bookmarks…" }
-        return (vm.phonetic && vm.canPhonetic) ? "privet → привет…" : "Translate \(vm.sourceLang.name)…"
+        if vm.phonetic, let scheme = vm.sourceLang.phoneticScheme { return scheme.placeholder }
+        return "Translate \(vm.sourceLang.name)…"
     }
 
     // MARK: - Results
@@ -230,7 +243,7 @@ struct ContentView: View {
                 .foregroundStyle(.secondary)
             VStack(spacing: 3) {
                 Text("Click any result to copy · ▶ to hear it · ☆ to save")
-                Text("Toggle **Phonetic** to type Cyrillic with Latin letters")
+                Text("Toggle **Phonetic** to type Cyrillic, kana or Hangul with Latin letters")
             }
             .font(.system(size: 11))
             .foregroundStyle(.tertiary)
@@ -350,8 +363,8 @@ struct ContentView: View {
     private func copyPrimaryIfAny() {
         if let primary = vm.output?.primary, !primary.isEmpty {
             copy(primary, label: "Copied")
-        } else if vm.phonetic && vm.canPhonetic, !vm.cyrillicPreview.isEmpty {
-            copy(vm.cyrillicPreview, label: "\(vm.sourceLang.name) copied")
+        } else if vm.phonetic && vm.canPhonetic, !vm.phoneticPreview.isEmpty {
+            copy(vm.phoneticPreview, label: "\(vm.sourceLang.name) copied")
         }
     }
 
@@ -398,5 +411,9 @@ struct ContentView: View {
         if args.contains("--bookmarks") { mode = .bookmarks }
         if args.contains("--open-picker-target") { pickerSide = .target }
         else if args.contains("--open-picker") { pickerSide = .source }
+        if let i = args.firstIndex(of: "--source"), i + 1 < args.count,
+           let lang = Language.byCode(args[i + 1]) { vm.setSource(lang) }
+        if args.contains("--phonetic") { vm.phonetic = true }
+        if let i = args.firstIndex(of: "--query"), i + 1 < args.count { vm.query = args[i + 1] }
     }
 }

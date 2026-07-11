@@ -10,7 +10,7 @@ final class SearchViewModel: ObservableObject {
     @Published var phonetic: Bool = false { didSet { onConfigChange() } }
 
     // Derived input
-    @Published var cyrillicPreview: String = ""
+    @Published var phoneticPreview: String = ""
     @Published var phonemes: [Phoneme] = []
 
     // Output
@@ -28,12 +28,12 @@ final class SearchViewModel: ObservableObject {
         targetLang = Language.byCode(defaults.string(forKey: AppInfo.Defaults.targetLang) ?? "") ?? .russian
     }
 
-    /// Phonetic Latin→Cyrillic input only applies when the source language uses Cyrillic.
-    var canPhonetic: Bool { sourceLang.isCyrillic }
+    /// Phonetic input applies when the source language has a Latin → native-script scheme.
+    var canPhonetic: Bool { sourceLang.phoneticScheme != nil }
 
-    /// The actual source text sent to the API (transliterated Cyrillic when phonetic input is on).
+    /// The actual source text sent to the API (transliterated when phonetic input is on).
     var effectiveSource: String {
-        (phonetic && canPhonetic) ? cyrillicPreview : query
+        (phonetic && canPhonetic) ? phoneticPreview : query
     }
 
     var effectiveFrom: Language { sourceLang }
@@ -42,7 +42,7 @@ final class SearchViewModel: ObservableObject {
     func setSource(_ lang: Language) {
         if lang == targetLang { targetLang = sourceLang }   // keep the two sides distinct
         sourceLang = lang
-        if !lang.isCyrillic { phonetic = false }
+        if lang.phoneticScheme == nil { phonetic = false }
     }
 
     func setTarget(_ lang: Language) {
@@ -69,13 +69,13 @@ final class SearchViewModel: ObservableObject {
     }
 
     private func recomputePhonetics() {
-        guard phonetic && canPhonetic else {
-            cyrillicPreview = ""
+        guard phonetic, let scheme = sourceLang.phoneticScheme else {
+            phoneticPreview = ""
             phonemes = []
             return
         }
-        let result = Transliterator.convert(query)
-        cyrillicPreview = result.text
+        let result = Transliterator.convert(query, scheme: scheme)
+        phoneticPreview = result.text
         phonemes = result.phonemes
     }
 
@@ -180,7 +180,7 @@ final class SearchViewModel: ObservableObject {
         let oldSource = sourceLang
         sourceLang = targetLang
         targetLang = oldSource
-        if !sourceLang.isCyrillic { phonetic = false }
+        if sourceLang.phoneticScheme == nil { phonetic = false }
     }
 
     func clear() {

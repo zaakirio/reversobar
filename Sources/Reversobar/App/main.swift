@@ -8,6 +8,7 @@ func runApp() {
     if CommandLine.arguments.contains("--window") {
         let app = NSApplication.shared
         app.setActivationPolicy(.regular)
+        if CommandLine.arguments.contains("--dark") { app.appearance = NSAppearance(named: .darkAqua) }
         let win = NSWindow(contentRect: NSRect(origin: .zero, size: Theme.popoverSize),
                            styleMask: [.borderless], backing: .buffered, defer: false)
         win.contentView = NSHostingView(rootView: ContentView())
