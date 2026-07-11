@@ -110,14 +110,33 @@ final class SearchViewModel: ObservableObject {
                 let response = try await self.client.translate(text, from: from, to: to)
                 try Task.checkCancellation()
                 let out = Self.output(from: response)
-                TranslationCache.shared.set(out, input: text, from: from, to: to)
+                // Never cache an empty result: a transient bad body would otherwise pin
+                // "No translation found." to this query forever via the instant cache path.
+                if !out.isEmpty {
+                    TranslationCache.shared.set(out, input: text, from: from, to: to)
+                }
                 self.apply(out)
             } catch is CancellationError {
                 // Superseded by a newer keystroke; leave state to the newer task.
             } catch {
+                // URLSession surfaces mid-flight cancellation as URLError(.cancelled), not
+                // CancellationError — without this guard a superseded request would stomp
+                // the newer search's state with a spurious connection error.
+                guard !Task.isCancelled else { return }
                 self.isLoading = false
-                self.errorMessage = "Couldn’t reach Reverso. Check your connection."
+                self.errorMessage = Self.message(for: error)
             }
+        }
+    }
+
+    private static func message(for error: Error) -> String {
+        switch error {
+        case ReversoError.badStatus(let code):
+            return "Reverso returned an error (HTTP \(code)). Try again in a moment."
+        case is DecodingError:
+            return "Reverso sent an unexpected response."
+        default:
+            return "Couldn’t reach Reverso. Check your connection."
         }
     }
 

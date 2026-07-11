@@ -22,7 +22,7 @@ case "$TARGET" in
     *.app)
         ZIP="build/$(basename "$TARGET" .app)-notarize.zip"
         echo "▶ Zipping app for submission…"
-        ditto -c -k --keepParent "$TARGET" "$ZIP"
+        ditto -c -k --sequesterRsrc --keepParent "$TARGET" "$ZIP"
         submit "$ZIP"
         echo "▶ Stapling ticket to the app…"
         xcrun stapler staple "$TARGET"
@@ -38,5 +38,9 @@ case "$TARGET" in
 esac
 
 echo "▶ Verifying with Gatekeeper…"
-spctl --assess --type "$([[ "$TARGET" == *.dmg ]] && echo open --context context:primary-signature || echo execute)" --verbose "$TARGET" || true
+if [[ "$TARGET" == *.dmg ]]; then
+    spctl --assess --type open --context context:primary-signature --verbose "$TARGET"
+else
+    spctl --assess --type execute --verbose "$TARGET"
+fi
 echo "✅ Notarized & stapled: $TARGET"

@@ -2,7 +2,7 @@
 # Downloads flag-icons (lipis, MIT) 4x3 SVGs and rasterizes them to PNGs bundled with the app.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-OUT="Sources/LangBar/Flags"
+OUT="Sources/Reversobar/Resources/Flags"
 TMP="$(mktemp -d)"
 mkdir -p "$OUT"
 

@@ -9,6 +9,7 @@ struct PrimaryCard: View {
     let onCopy: (String) -> Void
     @State private var hovering = false
     @State private var flashing = false
+    @State private var flashTask: Task<Void, Never>?
 
     var body: some View {
         Button(action: flashCopy) {
@@ -40,9 +41,11 @@ struct PrimaryCard: View {
 
     private func flashCopy() {
         onCopy(text)
+        flashTask?.cancel()
         withAnimation(Theme.Anim.snappy) { flashing = true }
-        Task {
+        flashTask = Task {
             try? await Task.sleep(for: .seconds(0.9))
+            guard !Task.isCancelled else { return }
             withAnimation(Theme.Anim.snappy) { flashing = false }
         }
     }

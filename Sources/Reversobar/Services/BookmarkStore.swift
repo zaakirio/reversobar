@@ -36,9 +36,16 @@ final class BookmarkStore: ObservableObject {
     }
 
     private func load() {
-        guard let data = try? Data(contentsOf: fileURL),
-              let decoded = try? JSONDecoder().decode([Bookmark].self, from: data) else { return }
-        items = decoded
+        guard let data = try? Data(contentsOf: fileURL) else { return }
+        do {
+            items = try JSONDecoder().decode([Bookmark].self, from: data)
+        } catch {
+            // The next save() would overwrite a file we couldn't read, destroying the
+            // user's phrasebook — set it aside for recovery instead.
+            let backup = fileURL.appendingPathExtension("corrupt")
+            try? FileManager.default.removeItem(at: backup)
+            try? FileManager.default.moveItem(at: fileURL, to: backup)
+        }
     }
 
     private func save() {

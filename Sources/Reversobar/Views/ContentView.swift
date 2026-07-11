@@ -11,6 +11,7 @@ struct ContentView: View {
     @ObservedObject private var bookmarks = BookmarkStore.shared
     @FocusState private var searchFocused: Bool
     @State private var copiedToast: String?
+    @State private var toastTask: Task<Void, Never>?
     @State private var pickerSide: PickerSide?
     @State private var mode: Mode = .search
     @State private var bookmarkFilter = ""
@@ -375,9 +376,11 @@ struct ContentView: View {
     }
 
     private func flashToast(_ label: String) {
+        toastTask?.cancel()
         withAnimation(Theme.Anim.toast) { copiedToast = label }
-        Task {
+        toastTask = Task {
             try? await Task.sleep(for: .seconds(1.1))
+            guard !Task.isCancelled else { return }
             withAnimation(.easeOut(duration: 0.2)) { copiedToast = nil }
         }
     }

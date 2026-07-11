@@ -18,6 +18,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         observeLanguageChanges()
     }
 
+    func applicationWillTerminate(_ notification: Notification) {
+        TranslationCache.shared.flush()
+    }
+
     // MARK: - Setup
 
     /// A menu-bar-only (LSUIElement) app has no main menu, so the standard text-editing key

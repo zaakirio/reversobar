@@ -102,8 +102,9 @@ This runs the full pipeline and leaves two signed, **notarized, stapled** artifa
 `Reversobar-<version>.zip` (the primary download — the stapled app inside) and
 `Reversobar-<version>.dmg`. Both open on any Mac with no Gatekeeper warning.
 Individual steps are also available:
-`make app`, `make dmg`, `make notarize`. Override version/identity via `REVERSOBAR_VERSION`,
-`REVERSOBAR_BUILD`, `REVERSOBAR_SIGN_ID`, `REVERSOBAR_NOTARY_PROFILE`.
+`make app`, `make dmg`, `make notarize`. The release version lives in the `VERSION` file;
+override per-run via `REVERSOBAR_VERSION`, `REVERSOBAR_BUILD`, `REVERSOBAR_SIGN_ID`,
+`REVERSOBAR_NOTARY_PROFILE`.
 
 The app uses **hardened runtime** with no special entitlements — it is not sandboxed, and a
 non-sandboxed network client needs none.

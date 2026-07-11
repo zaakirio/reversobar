@@ -78,6 +78,15 @@ final class TranslationCache {
         }
     }
 
+    /// Writes any pending (debounced) changes immediately; called at app termination so
+    /// entries cached in the last 1.5 s aren't lost with the process.
+    func flush() {
+        guard saveTask != nil else { return }
+        saveTask?.cancel()
+        saveTask = nil
+        save()
+    }
+
     private func save() {
         let entries = order.compactMap { key in map[key].map { Entry(key: key, output: $0) } }
         guard let data = try? JSONEncoder().encode(entries) else { return }

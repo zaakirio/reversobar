@@ -4,20 +4,12 @@
 # (override with REVERSOBAR_SIGN_ID), otherwise falls back to an ad-hoc signature.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+source scripts/common.sh
 
 APP="build/Reversobar.app"
 BUNDLE_ID="com.zaakir.reversobar"
-VERSION="${REVERSOBAR_VERSION:-1.0.0}"
-BUILD="${REVERSOBAR_BUILD:-1}"
 
-# --- Resolve a signing identity -------------------------------------------------
-if [[ -n "${REVERSOBAR_SIGN_ID:-}" ]]; then
-    SIGN_ID="$REVERSOBAR_SIGN_ID"
-else
-    SIGN_ID="$(security find-identity -v -p codesigning 2>/dev/null \
-        | grep -m1 'Developer ID Application' | sed -E 's/.*"(.*)"/\1/' || true)"
-    [[ -z "$SIGN_ID" ]] && SIGN_ID="-"   # ad-hoc fallback
-fi
+resolve_sign_id
 echo "▶ Signing identity: $SIGN_ID"
 
 # --- Build a universal release binary ------------------------------------------
@@ -82,4 +74,7 @@ codesign --verify --strict --verbose=2 "$APP"
 echo
 echo "✅ Built $(pwd)/$APP  (v$VERSION build $BUILD)"
 file "$APP/Contents/MacOS/Reversobar" | sed 's/^/   /'
-[[ "$SIGN_ID" == "-" ]] && echo "   ⚠️  ad-hoc signed — for distribution set REVERSOBAR_SIGN_ID and run scripts/release.sh"
+# (Plain `[[ ... ]] && echo` as the last command would make the script exit 1 when signed.)
+if [[ "$SIGN_ID" == "-" ]]; then
+    echo "   ⚠️  ad-hoc signed — for distribution set REVERSOBAR_SIGN_ID and run scripts/release.sh"
+fi
