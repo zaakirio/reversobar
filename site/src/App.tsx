@@ -2,6 +2,7 @@ import { MotionConfig, motion } from "motion/react";
 import { DotField } from "./components/DotField";
 import { DownloadButton } from "./components/DownloadButton";
 import { PhoneticDemo } from "./components/PhoneticDemo";
+import { PopoverDemo } from "./components/PopoverDemo";
 import { GITHUB_URL } from "./constants";
 import "./app.css";
 
@@ -99,13 +100,7 @@ function Hero() {
             </span>
             <span className="menubar-time">Fri 09:41</span>
           </div>
-          <img
-            className="hero-shot-img"
-            src="/app-shot-results.png"
-            alt='Reversobar popover translating "hello" from English to Russian, showing привет and alternative translations'
-            width="880"
-            height="1120"
-          />
+          <PopoverDemo />
         </motion.figure>
       </div>
     </header>
@@ -165,11 +160,11 @@ function Board() {
           </motion.div>
 
           <motion.div {...reveal} className="tile tile-fast">
-            <span className="tile-big">0<small>ms</small></span>
-            <h3>Fast, then instant</h3>
+            <span className="tile-big">5<small>µs wait</small></span>
+            <h3>Instant on repeat</h3>
             <p>
-              Live results as you type, stale requests cancelled mid-flight.
-              Repeat lookups come from cache and skip the network entirely.
+              Live results as you type. Anything you&apos;ve looked up before
+              loads straight from the on-device cache - even offline.
             </p>
           </motion.div>
 
